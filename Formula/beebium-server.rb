@@ -12,8 +12,8 @@
 class BeebiumServer < Formula
   desc "Headless BBC Micro emulator servers for Model B, B+, B+ 128K and ROM/RAM"
   homepage "https://github.com/rob-smallshire/beebium"
-  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.1.14.tar.gz"
-  sha256 "4f4052677031120a833c1f7110a248ef063b11206e01a47af51dbd9329a84d9a"
+  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.1.15.tar.gz"
+  sha256 "87b3f42361a56f49ad0b2294b1f19ea0eaacdd40623757abacfa5f267368fcb9"
   license "GPL-3.0-or-later"
   head "https://github.com/rob-smallshire/beebium.git", branch: "master"
 
