@@ -16,11 +16,11 @@
 cask "beebium-gui" do
   arch arm: "arm64", intel: "x86_64"
 
-  version "0.5.0"
+  version "0.6.0"
   # Placeholders (distinct per arch so `brew style` is satisfied); the real
   # per-architecture hashes are pinned by sync-gui-cask.sh at release time.
-  sha256 arm:   "4e1326dd6d9db5c060f916160482e97341e7dcde4637de8d2f5c3ed19af23176",
-         intel: "a881bc22312bbfdff7fdcfc61cf390170bf86e1a2b7a90d7af5fbc059bd82c38"
+  sha256 arm:   "1f733c4a7de2128f10a5385610c25d7ff764b619e899ff6c50c3d84df3b026a4",
+         intel: "f2d9a9207e9b4e1e2f448913dc3fd37fb582a7046f01676f33de3c7514724521"
 
   url "https://github.com/rob-smallshire/beebium/releases/download/v#{version}/Beebium-#{version}-macos-#{arch}.dmg"
   name "Beebium"
