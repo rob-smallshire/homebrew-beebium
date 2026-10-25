@@ -12,8 +12,8 @@
 class BeebiumServer < Formula
   desc "Headless BBC Micro emulator servers"
   homepage "https://github.com/rob-smallshire/beebium"
-  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.13.1.tar.gz"
-  sha256 "ba59a9a60531671a78adeacb542e8222bd617acee9b18e2bd720b2bc02354561"
+  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.14.0.tar.gz"
+  sha256 "b46e942b512ac4fec5ebeefa923a03874b250b3cb7a53c9c30c8d1c697fbad9b"
   license "GPL-3.0-or-later"
   head "https://github.com/rob-smallshire/beebium.git", branch: "master"
 
@@ -85,6 +85,11 @@ class BeebiumServer < Formula
     presets = shell_output("#{bin}/beebium-model-b --format tsv list-presets")
     assert_match(/^model-b\t/, presets)
     assert_match(/^model-b-disc\t/, presets)
+
+    # Blank disc templates are found the same way, in libexec/share/beebium/
+    # blank-discs.
+    blank_discs = shell_output("#{bin}/beebium-model-b --format tsv list-blank-discs")
+    assert_match(/^Acorn DFS 80T SS 200K\t/, blank_discs)
 
     # ROM discovery: a headless screenshot loads the MOS from libexec/share/
     # beebium/roms, runs briefly and exits on its own, so no server has to be
