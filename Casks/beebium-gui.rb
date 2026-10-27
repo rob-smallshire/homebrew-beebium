@@ -16,9 +16,9 @@
 # headless servers), this CASK installs the prebuilt .app -- which embeds its own
 # servers, ROMs, presets and extensions -- so the two do not overlap.
 cask "beebium-gui" do
-  version "0.14.0"
+  version "0.15.0"
   # Placeholder; the real hash is pinned by sync-gui-cask.sh at release time.
-  sha256 "5b8a977c4d9907dddf643be632138b466d628806c1b662eb99fa2df920b70f3a"
+  sha256 "674d50a40c723132bd9009e5a5d9e99d3cc6eaf2835170a0f4c44d48efe695db"
 
   url "https://github.com/rob-smallshire/beebium/releases/download/v#{version}/Beebium-#{version}-macos-arm64.dmg"
   name "Beebium"
