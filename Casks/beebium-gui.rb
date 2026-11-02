@@ -6,31 +6,31 @@
 # This is the canonical copy, kept in the monorepo for development, review and
 # CI (brew audit/style run against it). It is mirrored into the tap
 # (rob-smallshire/homebrew-beebium, Casks/beebium-gui.rb) at release time by
-# packaging/homebrew/sync-gui-cask.sh, which pins the DMG url and its sha256 to
-# a published release. It is arm64-only while Intel macOS is suspended until a
-# self-hosted Intel runner exists (#223); restoring brings back the arch stanza
-# and the per-architecture sha256 pair.
+# packaging/homebrew/sync-gui-cask.sh, which pins the two per-architecture DMG
+# urls and their sha256s to a published release.
 #
 # The DMGs are Developer ID signed, notarized and stapled, so Gatekeeper accepts
 # them on first launch. Unlike the beebium-server FORMULA (a source build of the
 # headless servers), this CASK installs the prebuilt .app -- which embeds its own
 # servers, ROMs, presets and extensions -- so the two do not overlap.
 cask "beebium-gui" do
-  version "0.15.0"
-  # Placeholder; the real hash is pinned by sync-gui-cask.sh at release time.
-  sha256 "674d50a40c723132bd9009e5a5d9e99d3cc6eaf2835170a0f4c44d48efe695db"
+  arch arm: "arm64", intel: "x86_64"
 
-  url "https://github.com/rob-smallshire/beebium/releases/download/v#{version}/Beebium-#{version}-macos-arm64.dmg"
+  version "0.16.0"
+  # Placeholders (distinct per arch so `brew style` is satisfied); the real
+  # per-architecture hashes are pinned by sync-gui-cask.sh at release time.
+  sha256 arm:   "aef6f00cd6d2b73e37bddd00cd522f541fbd5f22670a91053dfaac218f0a9898",
+         intel: "c90dccc7e7f334059db0d993b64c00bad5cefcd9387a1f60477a08518f2551de"
+
+  url "https://github.com/rob-smallshire/beebium/releases/download/v#{version}/Beebium-#{version}-macos-#{arch}.dmg"
   name "Beebium"
   desc "BBC Micro emulator with a graphical interface"
   homepage "https://github.com/rob-smallshire/beebium"
 
   auto_updates false
-  # arm64 only while Intel macOS is suspended (#223).
-  depends_on arch: :arm64
-  # The app's deployment target is macOS 13 (Ventura) -- higher than the
-  # beebium-server wheels' floor (Big Sur), because the SwiftUI/Metal front end
-  # needs it. The bare symbol means "Ventura or newer".
+  # The app's deployment target is macOS 13 (Ventura) on BOTH architectures --
+  # higher than the beebium-server wheels' floors (Big Sur/Monterey), because the
+  # SwiftUI/Metal front end needs it. The bare symbol means "Ventura or newer".
   depends_on macos: :ventura
 
   app "Beebium.app"
