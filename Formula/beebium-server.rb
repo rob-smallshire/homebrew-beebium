@@ -12,8 +12,8 @@
 class BeebiumServer < Formula
   desc "Headless BBC Micro emulator servers"
   homepage "https://github.com/rob-smallshire/beebium"
-  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.21.0.tar.gz"
-  sha256 "7fc696a805a1a5ccd4842fde488f23230f58e2cd9522f2ab6238a3d015af2ffe"
+  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.22.1.tar.gz"
+  sha256 "86e374a89e243116a41c8898a7ef933bce4e0bed09c65e1f7ae860d0cc92f8e6"
   license "GPL-3.0-or-later"
   head "https://github.com/rob-smallshire/beebium.git", branch: "master"
 
@@ -34,20 +34,23 @@ class BeebiumServer < Formula
            "-DBEEBIUM_BUILD_TESTS=OFF"
     system "cmake", "--build", "build", "--target", "beebium-servers"
 
-    # Install the whole relocatable tree under libexec: one server binary per
-    # machine variant (libexec/bin/beebium-model-*, beebium-master-*), the extension ABI dylibs
-    # (libexec/lib), the dlopened plugins (libexec/bin/extensions/<name>) and
-    # the ROMs and presets (libexec/share/beebium). The binaries
-    # resolve all of these relative to their own on-disk location, so the tree
-    # relocates intact.
+    # Install the whole relocatable tree under libexec: the multi-call server
+    # (libexec/bin/beebium-server) with a relative symlink per machine model
+    # beside it (libexec/bin/beebium-model-*, beebium-master-*), the extension
+    # ABI dylibs (libexec/lib), the dlopened plugins
+    # (libexec/bin/extensions/<name>) and the ROMs and presets
+    # (libexec/share/beebium). The server resolves all of these relative to
+    # its own on-disk location, so the tree relocates intact.
     system "cmake", "--install", "build", "--prefix", libexec
 
-    # Put every server on the user's PATH without dragging the rest of the tree
-    # (notably bin/extensions) onto it. Every resource lookup (extensions, ROMs,
-    # presets) is relative to the binary's real on-disk location,
-    # resolved through this symlink, so they all find the libexec tree. The
-    # test block exercises each lookup through the symlink.
-    bin.install_symlink (libexec/"bin").glob("beebium-{model,master}-*")
+    # Put the server and every model name on the user's PATH without dragging
+    # the rest of the tree (notably bin/extensions) onto it. A model name links
+    # to libexec's model link, which links to beebium-server, so the server
+    # sees the model's name in argv[0] and dispatches on it. Every resource
+    # lookup (extensions, ROMs, presets) is relative to the binary's real
+    # on-disk location, resolved through the links, so they all find the
+    # libexec tree. The test block exercises each lookup through the links.
+    bin.install_symlink (libexec/"bin").glob("beebium-{server,model-*,master-*}")
   end
 
   test do
@@ -68,17 +71,23 @@ class BeebiumServer < Formula
     # The plugins must resolve out of the installed tree, not a build dir.
     assert_match (libexec/"bin/extensions").to_s, output
 
-    # Every machine variant is on PATH and resolves its plugins out of the keg
-    # through its own symlink.
+    # Every machine variant is on PATH as a link to the one multi-call server
+    # and resolves its plugins out of the keg through its own symlink.
     servers = bin.glob("beebium-{model,master}-*")
     refute_empty servers
     assert_includes servers.map { |s| s.basename.to_s }, "beebium-model-b"
     assert_includes servers.map { |s| s.basename.to_s }, "beebium-master-128"
     servers.each do |server|
       assert_predicate server, :symlink?
+      assert_equal (libexec/"bin/beebium-server").realpath, server.realpath
       assert_match (libexec/"bin/extensions").to_s,
                    shell_output("#{server} list-extensions")
     end
+
+    # The multi-call server also runs a model named as its first argument.
+    assert_match "master-128", shell_output("#{bin}/beebium-server --help")
+    assert_match (libexec/"bin/extensions").to_s,
+                 shell_output("#{bin}/beebium-server master-128 list-extensions")
 
     # Preset discovery: the built-in presets live in libexec/share/beebium/
     # presets. A binary that anchors on the symlink's own directory lists no
