@@ -12,8 +12,8 @@
 class BeebiumServer < Formula
   desc "Headless BBC Micro emulator servers"
   homepage "https://github.com/rob-smallshire/beebium"
-  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.20.1.tar.gz"
-  sha256 "cd3b4a1d353fa18cf88f514954fa121aade46e0d73604b88e84d2ef5ae18256b"
+  url "https://github.com/rob-smallshire/beebium/archive/refs/tags/v0.21.0.tar.gz"
+  sha256 "7fc696a805a1a5ccd4842fde488f23230f58e2cd9522f2ab6238a3d015af2ffe"
   license "GPL-3.0-or-later"
   head "https://github.com/rob-smallshire/beebium.git", branch: "master"
 
@@ -35,7 +35,7 @@ class BeebiumServer < Formula
     system "cmake", "--build", "build", "--target", "beebium-servers"
 
     # Install the whole relocatable tree under libexec: one server binary per
-    # machine variant (libexec/bin/beebium-model-*), the extension ABI dylibs
+    # machine variant (libexec/bin/beebium-model-*, beebium-master-*), the extension ABI dylibs
     # (libexec/lib), the dlopened plugins (libexec/bin/extensions/<name>) and
     # the ROMs and presets (libexec/share/beebium). The binaries
     # resolve all of these relative to their own on-disk location, so the tree
@@ -47,7 +47,7 @@ class BeebiumServer < Formula
     # presets) is relative to the binary's real on-disk location,
     # resolved through this symlink, so they all find the libexec tree. The
     # test block exercises each lookup through the symlink.
-    bin.install_symlink (libexec/"bin").glob("beebium-model-*")
+    bin.install_symlink (libexec/"bin").glob("beebium-{model,master}-*")
   end
 
   test do
@@ -70,9 +70,10 @@ class BeebiumServer < Formula
 
     # Every machine variant is on PATH and resolves its plugins out of the keg
     # through its own symlink.
-    servers = bin.glob("beebium-model-*")
+    servers = bin.glob("beebium-{model,master}-*")
     refute_empty servers
     assert_includes servers.map { |s| s.basename.to_s }, "beebium-model-b"
+    assert_includes servers.map { |s| s.basename.to_s }, "beebium-master-128"
     servers.each do |server|
       assert_predicate server, :symlink?
       assert_match (libexec/"bin/extensions").to_s,
